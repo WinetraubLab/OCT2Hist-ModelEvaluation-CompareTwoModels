@@ -10,6 +10,7 @@ from datetime import datetime
 import glob,os
 from shutil import copyfile
 import random
+import json
 
 app = Flask(__name__)
 #Flask-WTF requires an encryption key - the string can be anything
@@ -63,11 +64,45 @@ def model_compare_main():
         # If this is the first time user views the form, initalize the questioner
         print('Init questions')
         
-        # TODO
+        # Dir folders and read file paths
+        model_A_file_paths = glob.glob('static/model_A/*.*')
+        model_B_file_paths = glob.glob('static/model_B/*.*')
+        ground_truth_file_paths = glob.glob('static/ground_truth/*.*')
+        
+        # Extract file names only
+        model_A_file_names = [os.path.basename(file_path) for file_path in model_A_file_paths]
+        model_B_file_names = [os.path.basename(file_path) for file_path in model_B_file_paths]
+        ground_truth_file_names = [os.path.basename(file_path) for file_path in ground_truth_file_paths]
+        
+        # Make sure each file appears in all three folders
+        if ( 
+            (len(model_A_file_names) != len(model_B_file_names)) or 
+            (len(model_A_file_names) != len(ground_truth_file_names)) ):
+            print('Error: different number of files in model_A, model_B and ground_truth folders')
+            return
+        for A_file_name in  model_A_file_names:
+            if not A_file_name in model_B_file_names:
+                print(A_file_name + " exists in model A but not in model B")
+                return
+            if not A_file_name in ground_truth_file_names:
+                print(A_file_name + " exists in model A but not in ground truth")
+                return
+              
+        # Permute order
+        random.shuffle(model_A_file_names)
+        
+        # Log
+        print('These are the files to be used')
+        print(model_A_file_names)
+        
+        # Save to hidden varible
+        form.image_list.data = json.dumps(model_A_file_names)
         
         # Initalize current image to the start of the stack
         form.current_viewed_image_number.data = 0
     else:
+        # User entered response before
+                
         # Figure out what user's response was
         response = ''
         if form.both_options_are_bad.data:
@@ -97,6 +132,9 @@ def model_compare_main():
         
         # Move the id number one step
         form.current_viewed_image_number.data = int(form.current_viewed_image_number.data) + 1
+    
+    # Get image list from hidden varible
+    image_list = json.loads(form.image_list.data)
     
     # Check if additional images remain, if not present end screen
     # TODO
