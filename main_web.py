@@ -95,11 +95,14 @@ def model_compare_main():
         print('These are the files to be used')
         print(model_A_file_names)
         
-        # Save to hidden varible
+        # Save image list to hidden varible
         form.image_list.data = json.dumps(model_A_file_names)
         
         # Initalize current image to the start of the stack
         form.current_viewed_image_number.data = 0
+        
+        # Initalize selections to empty list
+        form.selections.data = json.dumps(list())
     else:
         # User entered response before
                 
@@ -128,7 +131,9 @@ def model_compare_main():
         print(response) # print selection to the back-end
                 
         # Log user response on the hidden field
-        # TODO
+        selection_list = json.loads(form.selections.data) # Get list from hidden varible
+        selection_list.append(response)
+        form.selections.data = json.dumps(selection_list)
         
         # Move the id number one step
         form.current_viewed_image_number.data = int(form.current_viewed_image_number.data) + 1
