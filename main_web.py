@@ -140,13 +140,24 @@ def model_compare_main():
     # TODO
     
     # Prepare to present the next image, first select if image one is A or B
+    current_viewed_image_name = image_list[form.current_viewed_image_number.data]
     if random.randint(0,1) == 0:
         form.is_one_A.data = False
+        option_1_image_path = "/static/model_B/" + current_viewed_image_name
+        option_2_image_path = "/static/model_A/" + current_viewed_image_name
     else:
         form.is_one_A.data = True
+        option_1_image_path = "/static/model_A/" + current_viewed_image_name
+        option_2_image_path = "/static/model_B/" + current_viewed_image_name
+    ground_truth_image_path = "/static/ground_truth/" + current_viewed_image_name
     
     # Present form to user
-    return render_template('model_compare_ui.html', form=form)
+    return render_template('model_compare_ui.html', form=form, 
+        image_index = form.current_viewed_image_number.data+1,
+        total_number_of_images = len(image_list),
+        option_1_image_path=option_1_image_path, 
+        option_2_image_path=option_2_image_path, 
+        ground_truth_image_path=ground_truth_image_path)
 
 
 ## Start Application ##############################################################
