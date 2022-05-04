@@ -1,6 +1,8 @@
 # Model Compare
 This module compares image quality between two models.
-Evaluation is duble blind, user doesn't know which image is being examined
+Evaluation is duble blind, user doesn't know which image is being examined.
+
+In order to properly evaluate two models it is recommended to compare 50 images from test and then running the tool again on 50 images from training set.
 
 ## To get started
 1. Run main_web.py
