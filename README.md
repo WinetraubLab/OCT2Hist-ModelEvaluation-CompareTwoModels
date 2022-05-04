@@ -1,9 +1,18 @@
-# OCT2Hist-ModelEvaluationGUI
-This project implements tools for human evaluation of OCT2Hist machine learning model.
-Implementation is by flask web interface. 
-
-To get started, run main_web.py and using a browser, navigate to http://localhost and follow the instructions
-
-## Model Compare
+# Model Compare
 This module compares image quality between two models.
-To get started logon to http://localhost/ModelCompareSetup
+Evaluation is duble blind, user doesn't know which image is being examined
+
+## To get started
+1. Run main_web.py
+2. Using web browser log on to http://localhost/ModelCompareSetup
+
+## Inputs
+Model Compare Inputs are:
+1. Model A virtual histology images - placed at static/model_A/
+2. Model B virtual histology images - placed at static/model_B/. Model B is sometimes refered to as refference model.
+3. Ground truth histology images - placed at static/ground_truth/
+
+## Outputs
+After a human evaluation the following will be presented on the web page
+1. Overall statistics - what were the preferences of the user.
+2. Detailed response - what user selected for each image pair.
