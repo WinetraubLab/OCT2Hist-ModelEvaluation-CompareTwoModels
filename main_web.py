@@ -11,6 +11,7 @@ import glob,os
 from shutil import copyfile
 import random
 import json
+import numpy as np
 
 app = Flask(__name__)
 #Flask-WTF requires an encryption key - the string can be anything
@@ -43,7 +44,7 @@ class ModelComparisonForm(FlaskForm):
     one_is_better = SubmitField('Option 1 Better')
     two_is_better = SubmitField('Option 2 Better')
     both_options_are_bad = SubmitField('Both are Bad')
-    both_options_are_good = SubmitField('Both are Good')
+    #both_options_are_good = SubmitField('Both are Good')
     
     # Hidden field containing the list of images and up to what image did we get
     image_list = HiddenField('Image List')
@@ -110,8 +111,8 @@ def model_compare_main():
         response = ''
         if form.both_options_are_bad.data:
             response = 'Both Bad'
-        elif form.both_options_are_good.data:
-            response = 'Both Good'
+        #elif form.both_options_are_good.data:
+        #    response = 'Both Good'
         else:
             # User selected one of the images, but which one was it?
             one_is_better = form.one_is_better.data
@@ -142,7 +143,8 @@ def model_compare_main():
     image_list = json.loads(form.image_list.data)
     
     # Check if additional images remain, if not present end screen
-    # TODO
+    if form.current_viewed_image_number.data >= len(image_list):
+        return model_compare_present_results(image_list,selection_list)
     
     # Prepare to present the next image, first select if image one is A or B
     current_viewed_image_name = image_list[form.current_viewed_image_number.data]
@@ -164,6 +166,30 @@ def model_compare_main():
         option_2_image_path=option_2_image_path, 
         ground_truth_image_path=ground_truth_image_path)
 
+# Inputs are:
+#   image_list - list of images reviewed by user
+#   selection_list - what did the user select
+def model_compare_present_results(image_list,selection_list):
+    # Compute statistics
+    option_A_better_n = np.sum(np.array([selection == 'A is better' for selection in selection_list]))
+    option_B_better_n = np.sum(np.array([selection == 'B is better' for selection in selection_list]))
+    both_bad_n = np.sum(np.array([selection == 'Both Bad' for selection in selection_list]))
+    total = len(selection_list)
+    
+    return render_template('model_compare_results.html',
+        option_A_better_n = option_A_better_n,
+        option_A_better_p = option_A_better_n/total*100,
+        
+        option_B_better_n = option_B_better_n,
+        option_B_better_p = option_B_better_n/total*100,
+        
+        both_bad_n = both_bad_n,
+        both_bad_p = both_bad_n/total*100,
+        
+        image_list = image_list,
+        selection_list = selection_list
+        )
+    
 
 ## Start Application ##############################################################
 if __name__ == '__main__':
