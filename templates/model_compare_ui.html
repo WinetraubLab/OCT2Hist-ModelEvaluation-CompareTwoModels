@@ -1,0 +1,40 @@
+{% extends 'bootstrap/base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block styles %}
+{{ super() }}
+	<style>
+		body { background: #e8f1f9; }
+		th, td {
+			padding: 3px;
+			text-align: center; 
+		}
+	</style>
+{% endblock %}
+
+
+{% block title %}
+OCT Histology Quality Questions
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container"><div class="row">
+	<h1 class="pt-5 pb-2">Please Select</h1>
+	Which option resembles ground truth more?<br><br>
+	<table>
+		<tr>
+			<th>Option A</th>
+			<th>Ground Truth</th>
+			<th>Option B</th>
+		</tr><tr>
+			<td><img src="/static/optionA.png"></td>
+			<td><img src="/static/optionB.png"></td>
+			<td><img src="/static/optionB.png"></td>
+		</tr>
+	</table>
+	{{ wtf.quick_form(form) }}
+</div></div>
+
+{% endblock %}
