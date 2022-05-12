@@ -178,13 +178,13 @@ def model_compare_present_results(image_list,selection_list):
     
     return render_template('model_compare_results.html',
         option_A_better_n = option_A_better_n,
-        option_A_better_p = '${0:.0f}'.format(option_A_better_n/total*100),
+        option_A_better_p = '{0:.0f}'.format(option_A_better_n/total*100),
         
         option_B_better_n = option_B_better_n,
-        option_B_better_p = '${0:.0f}'.format(option_B_better_n/total*100),
+        option_B_better_p = '{0:.0f}'.format(option_B_better_n/total*100),
         
         both_bad_n = both_bad_n,
-        both_bad_p = '${0:.0f}'.format(both_bad_n/total*100),
+        both_bad_p = '{0:.0f}'.format(both_bad_n/total*100),
         
         image_list = image_list,
         selection_list = selection_list
