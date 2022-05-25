@@ -44,6 +44,7 @@ class ModelComparisonForm(FlaskForm):
     one_is_better = SubmitField('Option 1 Better')
     two_is_better = SubmitField('Option 2 Better')
     both_options_are_bad = SubmitField('Both are Bad')
+    done_for_today = SubmitField('Im Done for Today')
     #both_options_are_good = SubmitField('Both are Good')
     
     # Hidden field containing the list of images and up to what image did we get
@@ -60,6 +61,7 @@ class ModelComparisonForm(FlaskForm):
 @app.route('/ModelCompare/', methods=['GET', 'POST'])    
 def model_compare_main():
     form = ModelComparisonForm()
+    response = ''
     
     if request.method == 'GET':
         # If this is the first time user views the form, initalize the questioner
@@ -108,11 +110,10 @@ def model_compare_main():
         # User entered response before
                 
         # Figure out what user's response was
-        response = ''
         if form.both_options_are_bad.data:
             response = 'Both Bad'
-        #elif form.both_options_are_good.data:
-        #    response = 'Both Good'
+        elif form.done_for_today.data:
+            response = 'Done'
         else:
             # User selected one of the images, but which one was it?
             one_is_better = form.one_is_better.data
@@ -130,20 +131,26 @@ def model_compare_main():
                 print('Error, cannot figure out what user selected')
                 return
         print(response) # print selection to the back-end
-                
-        # Log user response on the hidden field
+
+        # Capture data from form
+        form.current_viewed_image_number.data = int(form.current_viewed_image_number.data)
         selection_list = json.loads(form.selections.data) # Get list from hidden varible
-        selection_list.append(response)
-        form.selections.data = json.dumps(selection_list)
         
-        # Move the id number one step
-        form.current_viewed_image_number.data = int(form.current_viewed_image_number.data) + 1
+        if response!="Done":
+            # if response is not done for today, act on the data
+                
+            # Log user response on the hidden field
+            selection_list.append(response)
+            form.selections.data = json.dumps(selection_list)
+            
+            # Move the id number one step
+            form.current_viewed_image_number.data = int(form.current_viewed_image_number.data) + 1
     
     # Get image list from hidden varible
     image_list = json.loads(form.image_list.data)
     
-    # Check if additional images remain, if not present end screen
-    if form.current_viewed_image_number.data >= len(image_list):
+    # Check if additional images remain or user asked to stop, if not present end screen
+    if form.current_viewed_image_number.data >= len(image_list) or response=="Done":
         return model_compare_present_results(image_list,selection_list)
     
     # Prepare to present the next image, first select if image one is A or B
@@ -175,6 +182,8 @@ def model_compare_present_results(image_list,selection_list):
     option_B_better_n = np.sum(np.array([selection == 'B is better' for selection in selection_list]))
     both_bad_n = np.sum(np.array([selection == 'Both Bad' for selection in selection_list]))
     total = len(selection_list)
+    
+    image_list = image_list[0 : (len(selection_list)-1)]
     
     return render_template('model_compare_results.html',
         option_A_better_n = option_A_better_n,
